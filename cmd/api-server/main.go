@@ -3,10 +3,10 @@ package main
 import (
 	"log"
 
-	"github.com/gin-gonic/gin"
-
 	"github.com/1shkumar/mini-orchestrator/internal/api"
 	"github.com/1shkumar/mini-orchestrator/internal/db"
+	"github.com/1shkumar/mini-orchestrator/internal/kafka"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -15,6 +15,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	kafka.InitProducer()
 
 	r := gin.Default()
 
@@ -25,6 +27,11 @@ func main() {
 	})
 
 	r.POST("/workflow", api.CreateWorkflow)
+
+	r.POST(
+		"/workflow/:id/start",
+		api.StartWorkflow,
+	)
 
 	r.Run(":8080")
 }
