@@ -189,5 +189,29 @@ func StartConsumer() {
 				task.Name,
 			)
 		}
+
+		if db.AreAllTasksCompleted(
+			event.WorkflowRunID,
+		) {
+
+			err = db.MarkWorkflowCompleted(
+				event.WorkflowRunID,
+			)
+
+			if err != nil {
+
+				log.Println(
+					"failed marking workflow complete:",
+					err,
+				)
+
+				continue
+			}
+
+			log.Println(
+				"Workflow completed:",
+				event.WorkflowRunID,
+			)
+		}
 	}
 }
