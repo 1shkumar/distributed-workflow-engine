@@ -46,3 +46,22 @@ func MarkWorkflowCompleted(
 
 	return err
 }
+
+func MarkWorkflowFailed(
+	workflowRunID string,
+) error {
+
+	query := `
+	UPDATE workflow_runs
+	SET status = 'FAILED'
+	WHERE id = $1
+	`
+
+	_, err := DB.Exec(
+		context.Background(),
+		query,
+		workflowRunID,
+	)
+
+	return err
+}

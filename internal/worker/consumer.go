@@ -78,6 +78,54 @@ func StartConsumer() {
 			5 * time.Second,
 		)
 
+		if event.TaskName ==
+			"transform_fail" {
+
+			log.Println(
+				"simulated failure:",
+				event.TaskName,
+			)
+
+			attempt, _ :=
+				db.GetTaskAttempt(
+					event.WorkflowRunID,
+					event.TaskName,
+				)
+
+			if attempt < 3 {
+
+				db.IncrementTaskAttempt(
+					event.WorkflowRunID,
+					event.TaskName,
+				)
+
+				log.Println(
+					"Retrying task:",
+					event.TaskName,
+				)
+
+				kafka.PublishTask(event)
+
+				continue
+			}
+
+			db.MarkTaskFailed(
+				event.WorkflowRunID,
+				event.TaskName,
+			)
+
+			db.MarkWorkflowFailed(
+				event.WorkflowRunID,
+			)
+
+			log.Println(
+				"Task permanently failed:",
+				event.TaskName,
+			)
+
+			continue
+		}
+
 		err = db.MarkTaskSuccess(
 			event.WorkflowRunID,
 			event.TaskName,
