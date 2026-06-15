@@ -33,5 +33,10 @@ func main() {
 		api.StartWorkflow,
 	)
 
+	r.GET(
+		"/workflow/:id/status",
+		api.GetWorkflowStatus,
+	)
+
 	r.Run(":8080")
 }
