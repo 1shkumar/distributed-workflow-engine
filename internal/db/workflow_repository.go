@@ -43,3 +43,44 @@ func CreateWorkflow(
 
 	return id, nil
 }
+
+func GetWorkflowDefinitionByRunID(
+	workflowRunID string,
+) (
+	models.Workflow,
+	error,
+) {
+
+	query := `
+	SELECT w.definition
+	FROM workflows w
+	INNER JOIN workflow_runs wr
+	ON wr.workflow_id = w.id
+	WHERE wr.id = $1
+	`
+
+	var rawDefinition []byte
+
+	err := DB.QueryRow(
+		context.Background(),
+		query,
+		workflowRunID,
+	).Scan(&rawDefinition)
+
+	if err != nil {
+		return models.Workflow{}, err
+	}
+
+	var workflow models.Workflow
+
+	err = json.Unmarshal(
+		rawDefinition,
+		&workflow,
+	)
+
+	if err != nil {
+		return models.Workflow{}, err
+	}
+
+	return workflow, nil
+}

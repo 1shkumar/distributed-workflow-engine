@@ -13,7 +13,9 @@ var Writer *kafkago.Writer
 func InitProducer() {
 
 	Writer = &kafkago.Writer{
-		Addr:     kafkago.TCP("kafka:9092"),
+		Addr: kafkago.TCP(
+			"orchestrator-kafka:9092",
+		),
 		Topic:    "task-queue",
 		Balancer: &kafkago.LeastBytes{},
 	}
